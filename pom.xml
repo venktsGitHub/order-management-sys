@@ -48,6 +48,14 @@
 						</properties>
 					</cloudHubDeployment>
 					
+					<sharedLibraries>
+						<sharedLibrary>
+							<groupId>mysql</groupId>
+							<artifactId>mysql-connector-java</artifactId>
+						</sharedLibrary>
+							</sharedLibraries>
+					<classifier>mule-application</classifier>
+					
 					
 				</configuration>
 				
