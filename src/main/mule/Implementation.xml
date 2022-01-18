@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="BookTicketFlow" doc:id="3511e90a-a4b5-4a1b-a42d-138f10f56023" >
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="24b21968-1739-40ff-88d0-66022d06a786" variableName="pay"/>
+		<set-variable value='#[0 as Number]' doc:name="Set Variable" doc:id="f72e60dc-2feb-4d76-8892-405f6f4d4452" variableName="set"/>
+		<db:select doc:name="Select" doc:id="e240509b-26a8-4e34-9106-b84178038d02" target="watermark_sno" config-ref="Database_OrderDetails">
+			<db:sql ><![CDATA[select max(s_no) from orderManagement]]></db:sql>
+		</db:select>
+		<set-payload value="#[vars.pay]" doc:name="Set Payload" doc:id="5c9f4c6d-3495-4214-933b-f42937a44e5b" />
+		<ee:transform doc:name="Transform Message" doc:id="a9e4219f-9dd2-4789-a7a0-44ee6b034d68" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+fun cal_OrderID(num: Number) = if(num<10) "ODR00" ++ (num as String)
+								else "ODR0" ++ (num as String)
+fun fare(num: Number) = if(num>2) 80*num else 100*num
+fun coup(num: Number) = if(num>2) "true" else "false"
+
+---
+{
+	OrderID: cal_OrderID((vars.watermark_sno[0][0] as Number)+(1)) ,
+	date: payload.Body.BookTicket.date,
+	theaterName: payload.Body.BookTicket.theaterName,
+	movieName: payload.Body.BookTicket.movieName,
+	show: payload.Body.BookTicket.show,
+	noOfSeats: payload.Body.BookTicket.noOfSeats as Number,
+	price: payload.Body.BookTicket.price as Number,
+	address: payload.Body.BookTicket.address,
+	coupen: coup(payload.Body.BookTicket.noOfSeats as Number),
+	SeatNum: payload.Body.BookTicket.SeatNum,
+	emailID: payload.Body.BookTicket.emailID,
+	Discountedprice: fare(payload.Body.BookTicket.noOfSeats as Number),
+	BookingTime: payload.Body.BookTicket.BookingdateTime
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="12e34007-3fbd-4996-9e79-329d2d4b6083" />
+		<try doc:name="Try" doc:id="7bfe8b76-50cc-4000-855f-510d4e61f2b5" >
+			<db:insert doc:name="Insert" doc:id="365ea28c-6e5a-4eea-b445-70ba304042ee" config-ref="Database_OrderDetails">
+			<db:sql><![CDATA[	insert into orderManagement
+	(order_id,mail_id,theater_name,movie_name,show_date,show_time,seats,seat_nums,total_fare,coupen_applied,price_after_coupen,address,time_of_booking)
+	 values(:order_id,:mail_id,:theater_name,:movie_name,:date,:show_time,:seats,:seat_nums,:total_fare,:coupen_applied,:price_after_coupen,:address,:time_of_booking);]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+"order_id": payload.OrderID,
+ "mail_id": payload.emailID,
+ "theater_name": payload.theaterName,
+ "movie_name": payload.movieName,
+ "date": payload.date,
+ "show_time": payload.show,
+ "seats": payload.noOfSeats,
+ "seat_nums": payload.SeatNum,
+ "total_fare": payload.price,
+ "coupen_applied": payload.coupen,
+ "price_after_coupen": payload.Discountedprice,
+ "address": payload.address,
+ "time_of_booking":  payload.BookingTime
+ }]]]></db:input-parameters>
+		</db:insert>
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="361a3501-572c-49eb-a159-95588662bfc0" type="ANY">
+					<set-payload value='#["There is something Wrong with the Insert Operation Kindly check all the Inputs"]' doc:name="Set Payload" doc:id="a03833e1-51c8-4b7a-b64d-f36a7c3f03a2" />
+				</on-error-propagate>
+			</error-handler>
+		</try>
+		<db:select doc:name="Select" doc:id="18f5b0a5-0bbf-41fe-8110-c159c0254efa" config-ref="Database_OrderDetails">
+			<db:sql ><![CDATA[select * from orderManagement
+where s_no = :s_no]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"s_no": vars.watermark_sno[0][0] as Number + 1
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="b8964121-a084-4b4c-9f50-d517f19ac5b8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+root: payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="6c9ae8ea-aa4a-4435-ad77-6a92027f0436" />
+		</error-handler>
+	</flow>
+	<flow name="PrintTicketFlow" doc:id="e409266c-e14d-4d66-992b-2a7a9db7fa1b" >
+		<ee:transform doc:name="Transform Message" doc:id="f2805a15-6d35-41c9-ad3b-0ba65010ca2f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+ns ns0 http://schemas.xmlsoap.org/soap/envelope/
+ns ns01 http://mulesoft.org/orderManagement-service
+---
+{
+	"mail-id": payload.body.TrackStatus.email,
+	"Order-id": payload.Body.TrackStatus.orderId
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="de05eb5f-e0a7-4103-abe8-77a8c830b06d" />
+		<db:select doc:name="Select" doc:id="c7aa1b78-fee7-4f99-889e-816f72063ccd" config-ref="Database_OrderDetails">
+			<db:sql><![CDATA[select * from orderManagement
+where mail_id = :email and order_id = :orderID]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+"email": payload."mail-id" ,
+"orderID": payload."Order-id"
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="ea904953-c503-4405-8199-7e0481fbed4a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+---
+root: payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

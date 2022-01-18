@@ -1,0 +1,22 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ord="http://mulesoft.org/orderManagement-service">
+   <soapenv:Header>
+      <ord:AuthenticationHeader>
+         <apiKey>?</apiKey>
+      </ord:AuthenticationHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <ord:BookTicket>
+         
+         <date>?</date>
+         <theaterName>?</theaterName>
+         <movieName>?</movieName>
+         <show>?</show>
+         <noOfSeats>?</noOfSeats>
+         <SeatNum>?</SeatNum>
+         <price>?</price>
+         <emailID>?</emailID>
+         <address>?</address>
+         <BookingdateTime>?</BookingdateTime>
+      </ord:BookTicket>
+   </soapenv:Body>
+</soapenv:Envelope>

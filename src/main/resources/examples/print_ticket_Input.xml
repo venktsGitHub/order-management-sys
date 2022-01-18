@@ -1,0 +1,13 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ord="http://mulesoft.org/orderManagement-service">
+   <soapenv:Header>
+      <ord:AuthenticationHeader>
+         <apiKey>?</apiKey>
+      </ord:AuthenticationHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <ord:TrackStatus>
+         <email>?</email>
+         <orderId>?</orderId>
+      </ord:TrackStatus>
+   </soapenv:Body>
+</soapenv:Envelope>

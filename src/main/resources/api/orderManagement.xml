@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+
+<wsdl:definitions name="orderManagement" targetNamespace="http://mulesoft.org/orderManagement-service"
+    xmlns:ms="http://mulesoft.org/orderManagement-service" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+    <wsdl:types>
+
+        <xsd:schema targetNamespace="http://mulesoft.org/orderManagement-service" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+            <xsd:element name="BookTicket">
+                <xsd:complexType>
+                    <xsd:sequence>
+						<xsd:element name="date" type="xsd:string" />
+						<xsd:element name="theaterName" type="xsd:string" />
+						<xsd:element name="movieName" type="xsd:string" />
+						<xsd:element name="show" type="xsd:string" />
+						<xsd:element name="noOfSeats" type="xsd:integer" />
+						<xsd:element name="SeatNum" type="xsd:string" />
+                        <xsd:element name="price" type="xsd:integer" />
+						<xsd:element name="emailID" type="xsd:string" />
+						<xsd:element name="address" type="xsd:string" />
+						<xsd:element name="BookingdateTime" type="xsd:string" />
+					</xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+			<xsd:element name="BookTicketResponse">
+                <xsd:complexType>
+                    <xsd:all>
+						<xsd:element name="serialNum" type="xsd:integer" />
+						<xsd:element name="OrderID" type="xsd:string" />
+                        <xsd:element name="date" type="xsd:string" />
+						<xsd:element name="theaterName" type="xsd:string" />
+						<xsd:element name="movieName" type="xsd:string" />
+						<xsd:element name="show" type="xsd:string" />
+						<xsd:element name="noOfSeats" type="xsd:integer" />
+						<xsd:element name="SeatNum" type="xsd:string" />
+                        <xsd:element name="price" type="xsd:integer" />
+						<xsd:element name="coupen" type="xsd:string" />
+						<xsd:element name="Discountedprice" type="xsd:integer" />
+						<xsd:element name="emailID" type="xsd:string" />
+						<xsd:element name="address" type="xsd:string" />
+						<xsd:element name="BookingdateTime" type="xsd:string" />
+                    </xsd:all>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="TrackStatus">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="email" type="xsd:string" />
+                        <xsd:element name="orderId" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="TrackOrderResponse">
+                <xsd:complexType>
+                    <xsd:all>
+                        <xsd:element name="serialNum" type="xsd:integer" />
+						<xsd:element name="OrderID" type="xsd:string" />
+                        <xsd:element name="date" type="xsd:string" />
+						<xsd:element name="theaterName" type="xsd:string" />
+						<xsd:element name="movieName" type="xsd:string" />
+						<xsd:element name="show" type="xsd:string" />
+						<xsd:element name="noOfSeats" type="xsd:integer" />
+						<xsd:element name="SeatNum" type="xsd:string" />
+                        <xsd:element name="price" type="xsd:integer" />
+						<xsd:element name="coupen" type="xsd:string" />
+						<xsd:element name="Discountedprice" type="xsd:integer" />
+						<xsd:element name="emailID" type="xsd:string" />
+						<xsd:element name="address" type="xsd:string" />
+						<xsd:element name="BookingdateTime" type="xsd:string" />
+						</xsd:all>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="AuthenticationHeader">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="apiKey" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="APIUsageInformation">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="apiCallsRemaining" type="xsd:integer" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="orderFault">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="errorrStuff" type="xsd:integer" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+        </xsd:schema>
+    </wsdl:types>
+
+    <wsdl:message name="BookTicket">
+        <wsdl:part name="body" element="ms:BookTicket" />
+    </wsdl:message>
+
+    <wsdl:message name="BookTicketResponse">
+        <wsdl:part name="body" element="ms:BookTicketResponse" />
+    </wsdl:message>
+
+    <wsdl:message name="TrackStatus">
+        <wsdl:part name="body" element="ms:TrackStatus" />
+    </wsdl:message>
+
+    <wsdl:message name="TrackOrderResponse">
+        <wsdl:part name="body" element="ms:TrackOrderResponse" />
+    </wsdl:message>
+
+    <wsdl:message name="orderFault">
+        <wsdl:part name="fault" element="ms:orderFault" />
+    </wsdl:message>
+
+    <wsdl:message name="APIUsageInformation">
+        <wsdl:part name="header" element="ms:APIUsageInformation" />
+    </wsdl:message>
+
+    <wsdl:message name="AuthenticationHeader">
+        <wsdl:part name="header" element="ms:AuthenticationHeader" />
+    </wsdl:message>
+
+    <!-- wsdl:portType describes messages in an operation -->
+    <wsdl:portType name="orderManagementPortType">
+
+        <wsdl:operation name="BookTicket">
+            <wsdl:input message="ms:BookTicket" />
+            <wsdl:output message="ms:BookTicketResponse" />
+            <wsdl:fault name="orderFault" message="ms:orderFault" />
+        </wsdl:operation>
+
+        <wsdl:operation name="TrackStatus">
+            <wsdl:input message="ms:TrackStatus" />
+            <wsdl:output message="ms:TrackOrderResponse" />
+            <wsdl:fault name="orderFault" message="ms:orderFault" />
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="orderManagementServiceSoapBinding" type="ms:orderManagementPortType">
+
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+
+        <wsdl:operation name="BookTicket">
+
+            <soap:operation soapAction="http://mulesoft.org/orderManagement-service/order-orderManagement" />
+
+            <wsdl:input>
+                <soap:body use="literal" namespace="http://mulesoft.org/orderManagement-service" />
+                <soap:header use="literal" part="header" message="ms:AuthenticationHeader"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" namespace="http://mulesoft.org/orderManagement-service" />
+                <soap:header use="literal" part="header" message="ms:APIUsageInformation"/>
+            </wsdl:output>
+            <wsdl:fault name="orderFault">
+                <soap:body use="literal" namespace="http://mulesoft.org/orderManagement-service" />
+                <soap:header use="literal" part="header" message="ms:APIUsageInformation"/>
+            </wsdl:fault>
+
+        </wsdl:operation>
+
+        <wsdl:operation name="TrackStatus">
+
+            <soap:operation soapAction="http://mulesoft.org/orderManagement-service/track-status" />
+
+            <wsdl:input>
+                <soap:body use="literal" namespace="http://mulesoft.org/orderManagement-service" />
+                <soap:header use="literal" part="header" message="ms:AuthenticationHeader"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" namespace="http://mulesoft.org/orderManagement-service" />
+                <soap:header use="literal" part="header" message="ms:APIUsageInformation"/>
+            </wsdl:output>
+            <wsdl:fault name="orderFault">
+                <soap:body use="literal" namespace="http://mulesoft.org/orderManagement-service" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="orderManagement">
+        <wsdl:documentation></wsdl:documentation>
+
+        <!-- connect it to the binding "EndorsementSearchSoapBinding" above -->
+        <wsdl:port name="orderManagementPort" binding="ms:orderManagementServiceSoapBinding">
+
+            <!-- give the binding an network address -->
+            <soap:address location="http://localhost:8081/orderManagement" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
